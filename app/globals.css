@@ -118,7 +118,8 @@
 .high-contrast {
   --background: #000000 !important;
   --foreground: #ffffff !important;
-  --primary: #ffff00 !important; /* Sharp Yellow */
+  --primary: #ffff00 !important;
+  /* Sharp Yellow */
   --primary-foreground: #000000 !important;
   --secondary: #ffffff !important;
   --secondary-foreground: #000000 !important;
@@ -136,82 +137,139 @@
   outline-color: #ffff00 !important;
 }
 
-.high-contrast header, 
+.high-contrast header,
 .high-contrast footer,
 .high-contrast section {
-    background-color: #000000 !important;
-    color: #ffffff !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
 }
 
 .high-contrast button,
 .high-contrast a {
-    color: #ffff00 !important;
-    text-decoration: underline !important;
+  color: #ffff00 !important;
+  text-decoration: underline !important;
 }
 
 .high-contrast input {
-    background: #000000 !important;
-    border: 1px solid #ffffff !important;
-    color: #ffffff !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+  color: #ffffff !important;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 @keyframes glow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes slide-in {
-  from { transform: translateX(-100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes fade-in-up {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.5); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @layer utilities {
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
+
   .animate-glow {
     animation: glow 2s ease-in-out infinite;
   }
+
   .animate-slide-in {
     animation: slide-in 0.5s ease-out;
   }
+
   .animate-fade-in-up {
     animation: fade-in-up 0.6s ease-out;
   }
+
   .animate-pulse-ring {
     animation: pulse-ring 2s ease-out infinite;
   }
+
   .animate-gradient-shift {
     animation: gradient-shift 8s ease infinite;
     background-size: 200% 200%;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
