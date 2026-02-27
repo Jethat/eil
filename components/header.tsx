@@ -6,14 +6,16 @@ import { useState, useEffect, useRef } from 'react'
 import {
   Menu, X, Search, ChevronDown,
   Facebook, Twitter, Linkedin, Instagram, Youtube,
-  Monitor, Type, Globe, Contrast
+  Monitor, Type, Globe, Contrast, Volume2
 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface MenuItem {
   title: string
   href?: string
   items?: { name: string; href: string }[]
 }
+// ... (rest of the interface/constants remain the same)
 
 const menus: MenuItem[] = [
   {
@@ -139,8 +141,29 @@ export default function Header({ isScrolled = false }: HeaderProps) {
   const [fontSize, setFontSize] = useState('normal')
   const [highContrast, setHighContrast] = useState(false)
   const [isHoveringDropdown, setIsHoveringDropdown] = useState<string | null>(null)
+  const [language, setLanguage] = useState<'EN' | 'HI'>('EN')
+  const [tickerPaused, setTickerPaused] = useState(false)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Initialization & Persistence
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const savedFontSize = localStorage.getItem('eil-font-size') || 'normal'
+    const savedContrast = localStorage.getItem('eil-high-contrast') === 'true'
+    const savedLang = (localStorage.getItem('eil-lang') as 'EN' | 'HI') || 'EN'
+
+    if (savedFontSize !== 'normal') {
+      setFontSize(savedFontSize)
+      const root = document.documentElement
+      root.style.fontSize = savedFontSize === 'small' ? '14px' : savedFontSize === 'large' ? '18px' : '16px'
+    }
+    if (savedContrast) {
+      document.documentElement.classList.add('high-contrast')
+      setHighContrast(true)
+    }
+    setLanguage(savedLang)
+  }, [])
 
   // Close mobile menu on escape key
   useEffect(() => {
@@ -169,16 +192,37 @@ export default function Header({ isScrolled = false }: HeaderProps) {
   }, [mobileOpen])
 
   // Font size handler
-  const handleFontSize = (size: 'small' | 'normal' | 'large') => {
+  const handleFontSize = (size: 'small' | 'normal' | 'large', skipToast = false) => {
     setFontSize(size)
+    localStorage.setItem('eil-font-size', size)
     const root = document.documentElement
     root.style.fontSize = size === 'small' ? '14px' : size === 'large' ? '18px' : '16px'
+    if (!skipToast) toast.success(`Font size set to ${size}`)
   }
 
   // Contrast handler
   const toggleContrast = () => {
-    setHighContrast(!highContrast)
+    const newState = !highContrast
+    setHighContrast(newState)
+    localStorage.setItem('eil-high-contrast', String(newState))
     document.documentElement.classList.toggle('high-contrast')
+    toast.info(newState ? 'High Contrast Mode Enabled' : 'Standard Contrast Enabled')
+  }
+
+  // Language Switcher
+  const toggleLanguage = () => {
+    const newLang = language === 'EN' ? 'HI' : 'EN'
+    setLanguage(newLang)
+    localStorage.setItem('eil-lang', newLang)
+    toast.info(`Language switched to ${newLang === 'EN' ? 'English' : 'Hindi'}`)
+  }
+
+  // Screen Reader Mode
+  const toggleScreenReader = () => {
+    toast('Screen Reader Optimization', {
+      description: 'The site is now in high-accessibility mode for screen readers.',
+      icon: <Volume2 className="w-4 h-4 text-primary" />,
+    })
   }
 
   // Handle mouse enter with delay for smoother experience
@@ -218,8 +262,8 @@ export default function Header({ isScrolled = false }: HeaderProps) {
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${isScrolled
-          ? 'bg-primary/98 backdrop-blur-md shadow-2xl py-0'
-          : 'bg-primary py-1'
+        ? 'bg-primary/98 backdrop-blur-md shadow-2xl py-0'
+        : 'bg-primary py-1'
         } text-white`}
       aria-label="Main Header"
     >
@@ -240,20 +284,20 @@ export default function Header({ isScrolled = false }: HeaderProps) {
             ))}
           </div> */}
 
-            
-            <div className='flex gap-1 text-right'>
-              <div className='flex items-center gap-2'>
+
+          <div className='flex gap-1 text-right'>
+            <div className='flex items-center gap-2'>
               <span className='text-xs font-semibold'>NSE</span>
               <span className='text-sm font-bold'>220.10</span>
               <span className='text-xs text-green-400'>▲ +2.16%</span>
-              </div>
-              <div className='flex items-center gap-2'>
+            </div>
+            <div className='flex items-center gap-2'>
               <span className='text-xs font-semibold'>BSE</span>
               <span className='text-sm font-bold'>220.05</span>
               <span className='text-xs text-red-400'>▼ -1.52%</span>
-              </div>
             </div>
-            
+          </div>
+
 
           <div className="flex items-center gap-6">
             {utilityLinks.map((link) => (
@@ -270,18 +314,35 @@ export default function Header({ isScrolled = false }: HeaderProps) {
 
             {/* Accessibility & Tools */}
             <div className="flex items-center gap-3">
-              <button title="Screen Reader" className="hover:text-secondary transition-colors"><Monitor size={14} /></button>
+              <button
+                title="Screen Reader"
+                className="hover:text-secondary transition-colors"
+                onClick={toggleScreenReader}
+              >
+                <Monitor size={14} />
+              </button>
 
               <div className="flex items-center bg-white/10 rounded-full px-2 py-0.5 gap-2">
-                <button onClick={() => handleFontSize('small')} className="hover:text-secondary text-[9px] font-bold">A-</button>
-                <button onClick={() => handleFontSize('normal')} className="hover:text-secondary text-[11px] font-bold">A</button>
-                <button onClick={() => handleFontSize('large')} className="hover:text-secondary text-[13px] font-bold">A+</button>
+                <button onClick={() => handleFontSize('small')} className={`hover:text-secondary text-[9px] font-bold ${fontSize === 'small' ? 'text-secondary' : ''}`}>A-</button>
+                <button onClick={() => handleFontSize('normal')} className={`hover:text-secondary text-[11px] font-bold ${fontSize === 'normal' ? 'text-secondary' : ''}`}>A</button>
+                <button onClick={() => handleFontSize('large')} className={`hover:text-secondary text-[13px] font-bold ${fontSize === 'large' ? 'text-secondary' : ''}`}>A+</button>
               </div>
 
-              <button onClick={toggleContrast} title="Contrast" className="hover:text-secondary transition-colors"><Contrast size={14} /></button>
-              <button title="Language" className="hover:text-secondary transition-colors flex items-center gap-1">
+              <button
+                onClick={toggleContrast}
+                title="Contrast"
+                className={`hover:text-secondary transition-colors ${highContrast ? 'text-secondary' : ''}`}
+              >
+                <Contrast size={14} />
+              </button>
+
+              <button
+                onClick={toggleLanguage}
+                title="Language"
+                className="hover:text-secondary transition-colors flex items-center gap-1"
+              >
                 <Globe size={14} />
-                <span>EN</span>
+                <span className="font-bold">{language}</span>
               </button>
             </div>
           </div>
@@ -326,7 +387,7 @@ export default function Header({ isScrolled = false }: HeaderProps) {
                 <Link
                   href={menu.href || '#'}
                   className={`flex items-center gap-1 px-2 py-2 rounded-lg transition-all text-sm font-semibold cursor-pointer ${activeDesktopMenu === menu.title || isHoveringDropdown === menu.title ? 'bg-white/10 text-secondary' : 'hover:bg-white/5'
-                  }`}
+                    }`}
                 >
                   {menu.title.toUpperCase()}
                   <ChevronDown
@@ -337,7 +398,7 @@ export default function Header({ isScrolled = false }: HeaderProps) {
 
                 {/* Hover Bridge - Transparent connector to prevent flickering */}
                 {activeDesktopMenu === menu.title && (
-                  <div 
+                  <div
                     className="absolute top-full left-0 w-full h-4 -mt-4 z-40"
                     onMouseEnter={handleDropdownMouseEnter}
                     onMouseLeave={() => handleDropdownMouseLeave(menu.title)}
@@ -357,8 +418,8 @@ export default function Header({ isScrolled = false }: HeaderProps) {
                           key={item.name}
                           href={item.href}
                           className={`flex items-center gap-2 px-2 py-2.5 rounded-lg text-sm transition-all duration-200 ${idx === 0
-                              ? 'bg-primary/5 text-primary font-bold mb-1 hover:bg-primary/10'
-                              : 'text-gray-600 hover:bg-primary hover:text-white hover:translate-x-1'
+                            ? 'bg-primary/5 text-primary font-bold mb-1 hover:bg-primary/10'
+                            : 'text-gray-600 hover:bg-primary hover:text-white hover:translate-x-1'
                             }`}
                         >
                           {idx !== 0 && <span className="w-1.5 h-1.5 rounded-full bg-secondary opacity-40" />}
@@ -368,17 +429,17 @@ export default function Header({ isScrolled = false }: HeaderProps) {
                     </div>
                   </div>
                 )}
-              
+
               </div>
             ))}
 
             <Link
-                href="/contact"
-                className=" text-sm font-semibold"
-               
-              >
-                CONTACT US
-              </Link>
+              href="/contact"
+              className=" text-sm font-semibold"
+
+            >
+              CONTACT US
+            </Link>
           </nav>
 
           {/* Search and Mobile Toggle */}

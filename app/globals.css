@@ -115,6 +115,46 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+.high-contrast {
+  --background: #000000 !important;
+  --foreground: #ffffff !important;
+  --primary: #ffff00 !important; /* Sharp Yellow */
+  --primary-foreground: #000000 !important;
+  --secondary: #ffffff !important;
+  --secondary-foreground: #000000 !important;
+  --border: #ffffff !important;
+  --card: #000000 !important;
+  --card-foreground: #ffffff !important;
+  --accent: #ffff00 !important;
+  --accent-foreground: #000000 !important;
+  --muted: #111111 !important;
+  --muted-foreground: #ffffff !important;
+}
+
+.high-contrast * {
+  border-color: #ffffff !important;
+  outline-color: #ffff00 !important;
+}
+
+.high-contrast header, 
+.high-contrast footer,
+.high-contrast section {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+.high-contrast button,
+.high-contrast a {
+    color: #ffff00 !important;
+    text-decoration: underline !important;
+}
+
+.high-contrast input {
+    background: #000000 !important;
+    border: 1px solid #ffffff !important;
+    color: #ffffff !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
