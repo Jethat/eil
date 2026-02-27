@@ -23,7 +23,7 @@ export default function Hero() {
     <section className="relative w-full h-[60vh] sm:h-[75vh] lg:h-[80vh] min-h-[450px] overflow-hidden">
       {/* ── YouTube Background Video ── */}
       <div className="absolute inset-0 w-full h-full pointer-events-none">
-       <video src="/video1.mp4" autoPlay muted loop playsInline className="w-full h-full object-cover  "></video>
+       <video src="/Video Project 1.mp4" autoPlay muted loop playsInline className="w-full h-full object-cover  "></video>
       </div>
 
       {/* ── Semi-transparent overlay for better text contrast ── */}
